@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <script src="raphael.js"></script>
+<script type="text/javascript">window.onload = function(){
+var R = Raphael("canvas", window.innerWidth, window.innerHeight);
+var style = {fill: "none", stroke: "#666", "stroke-dasharray": "- "};
+
+var paths = [];
+
+for(var i=0;i<10;i++){
+  paths.push( makePath( 10 ) );
+}
+while(--i > 5){
+  paths.shift();
+}
+
+plotBoxes( reducePaths( paths ) , R);
+
+
+function transpose(a) {
+  var w = a.length ? a.length : 0, h = a[0] instanceof Array ? a[0].length : 0;
+  if(h === 0 || w === 0) { return []; }
+  var i, j, t = [];
+  for(i=0; i<h; i++) {
+    t[i] = [];
+    for(j=0; j<w; j++) {
+      t[i][j] = a[j][i];
+    }
+  }
+  return t;
+};
+
+function makePath( maxPath ){
+  var path = []; 
+  while( maxPath-- ){
+    path.push(parseInt(Math.ceil(Math.random()*maxPath+1),10));
+  }
+  return path.reverse();
+}
+
+function reducePaths( paths ){
+  var stages = {};
+  paths = transpose(paths);
+  var current = 0;
+  for( phaseArr in paths ){
+    stages['stage_'+current] = {};
+    for(item in paths[phaseArr]){
+      var key = paths[phaseArr][item];
+      stages['stage_'+current][key+''] = stages['stage_'+current][key+''] + 1 || 1;
+    }
+    current++;
+  } 
+  return stages;
+}
+
+function plotBoxes( data , R){
+  var stageIndex = 0;
+  var lastHeight = 0;
+  for(var p in data){
+    var phase = data[p];
+    var phaseTotal = 0;
+    for(var i in phase){
+      var dataPoint = phase[i];
+      phaseTotal   += dataPoint;
+    }
+    for(var i in phase){
+      var dataPoint = phase[i];
+      x=10+110*stageIndex,y=lastHeight+10,w=100,h=(dataPoint / phaseTotal)*(window.innerHeight/2);
+      R.rect(x,y,w,h).attr(style);
+      lastHeight += h+10;
+    }
+    lastHeight = 0;
+    stageIndex++;
+  }
+}
+
+
+
+  
+  
+
+
+
+
+}</script>
+  </head>
+  <body style="font-family:Helvetica;margin:0px;padding:0px;">
+    <h3>River Plot</h3>
+    <div id="canvas" style="height:100%;overflow:hidden;"> </div>
+  </body>
+</html>
